@@ -1,0 +1,12 @@
+FROM node:16 AS builder
+WORKDIR /app
+COPY package*.json .
+RUN npm install --production
+COPY . .
+RUN npm run build # Assuming you have a build script
+
+FROM node:16-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist # Assuming your build output is in dist
+CMD ["node", "./dist/index.js"]
